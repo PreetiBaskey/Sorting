@@ -1,0 +1,40 @@
+//approach - 1
+//time complexity - O(n*l + mlogm*l)
+//space complexity - O(m*l)
+class Solution {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k) {
+        vector<string> result;
+        
+        //stores the freqency of word on map
+        unordered_map<string, int> mp;
+        for(string &word: words) {
+            mp[word]++;
+        }
+
+        //stores the data from unordered_map to vector<pair<string, int>>
+        vector<pair<string, int>> wordCount;
+        for(auto &ele: mp) {
+            string str = ele.first;
+            int freq = ele.second;
+            wordCount.push_back({str, freq});
+        }
+
+        //sort the pairs on the basis of frequency
+        auto myComparator = [&](pair<string, int> &c1, pair<string, int> &c2) {
+            if(c1.second == c2.second) {
+                return c1.first < c2.first;
+            }
+            return c1.second > c2.second;
+        };          
+
+        //sort the wordCount based on the frequency
+        sort(wordCount.begin(), wordCount.end(), myComparator);
+
+        for(int i = 0; i < k; i++) {
+            result.push_back(wordCount[i].first);
+        }
+
+        return result;
+    }
+};
