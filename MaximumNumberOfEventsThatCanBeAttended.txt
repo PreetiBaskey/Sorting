@@ -1,0 +1,54 @@
+//approach - 1
+//time complexity - O(nlogn)
+//space complexity - O(n)
+class Solution {
+public:
+    int maxEvents(vector<vector<int>>& events) {
+        int n = events.size();
+        
+        // Min-heap to keep track of the END days of events currently available to us.
+        // Intuition: Always pick the event that finishes earliest to save time for others.
+        priority_queue<int, vector<int>, greater<int>> pq;
+
+        // Sort events by START day. We want to process them as they become available.
+        sort(begin(events), end(events));
+
+        int day = 0;   // The current day we are considering
+        int i = 0;     // Pointer for the events array
+        int count = 0; // Total events we managed to attend
+
+        while(!pq.empty() || i < n) {
+
+            // GAP HANDLING: If no events are active, jump the 'day' 
+            // to the start day of the next available event.
+            if(pq.empty()) {
+                day = events[i][0];
+            }
+            
+            // ADD NEW EVENTS: Add all events that start on the current day 
+            // to our "available" pool (priority queue).
+            while(i < n && events[i][0] == day) {
+                pq.push(events[i][1]);
+                i++;
+            }
+
+            // GREEDY CHOICE: Attend the event that is ending the soonest.
+            // Pop it from the queue because we used it today.
+            if(!pq.empty()) {
+                pq.pop();
+                count++;
+            }
+
+            // Move to the next calendar day
+            day++;
+
+            // CLEANUP: Remove events from the pool that have already ended.
+            // If the end_day < current_day, we missed it; it's useless now.
+            while(!pq.empty() && pq.top() < day) {
+                pq.pop();
+            }
+        }
+
+        return count;
+    }
+};
