@@ -1,0 +1,23 @@
+class Solution {
+public:
+    string getSortedString(int n) {
+        string s = to_string(n); //convert n to string to sort the string
+        sort(begin(s), end(s));
+        return s;
+    }
+    bool reorderedPowerOf2(int n) {
+        string s = getSortedString(n);
+        unordered_set<string> st;
+
+        for(int p = 0; p <= 29; p++) {
+            string pStr = getSortedString(1 << p);
+            st.insert(pStr);
+        }
+
+        if(st.count(s)) {
+            return true;
+        }
+
+        return false;
+    }
+};
