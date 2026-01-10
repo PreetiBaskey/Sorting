@@ -1,0 +1,40 @@
+//approach - 1 - using sorting and comparator
+//time complexity - O(nlogn)
+//space complexity - O(n)
+class Solution {
+public:
+    vector<int> maxSubsequence(vector<int>& nums, int k) {
+        vector<int> result;
+        int n = nums.size();
+
+        vector<pair<int, int>> arr;
+        for(int i = 0; i < n; i++) {
+            arr.push_back({nums[i], i});
+        }
+
+        auto myComparator = [&](auto &c1, auto &c2) {
+            return c1.first < c2.first;
+        };
+
+        sort(begin(arr), end(arr), myComparator);
+
+        vector<pair<int, int>> temp;
+        for(int i = n - 1; i >= n - k; i--) {
+            int num = arr[i].first;
+            int idx = arr[i].second;
+            temp.push_back({num, idx});
+        }
+
+        auto myTempComparator = [&] (auto &c1, auto &c2) {
+            return c1.second < c2.second;
+        };
+
+        sort(begin(temp), end(temp), myTempComparator);
+
+        for(auto &ele: temp) {
+            result.push_back(ele.first);
+        }
+
+        return result;
+    }
+};
