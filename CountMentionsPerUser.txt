@@ -1,0 +1,64 @@
+class Solution {
+public:
+    void applyMessageEvent(vector<string> &event, vector<int> &mentionCount, vector<int> &offlineTime) {
+        int timeStamp = stoi(event[1]);
+        vector<string> ids;
+
+        stringstream ss(event[2]);
+        string token;
+        while(ss >> token) {
+            ids.push_back(token);
+        }
+
+        for(string &id: ids) {
+            if(id == "ALL") { //mention/count all users irrespective of online or offline users
+                for(int i = 0; i < mentionCount.size(); i++) {
+                    mentionCount[i]++;
+                }
+            }
+            else if(id == "HERE") { //mention/count only online users
+                for(int i = 0; i < mentionCount.size(); i++) {
+                    if(offlineTime[i] == 0 || offlineTime[i] + 60 <= timeStamp) {
+                        mentionCount[i]++;
+                    }
+                }
+            }
+            else {
+                mentionCount[stoi(id.substr(2))]++; //if id given, get the users id and increase mention count of that user
+            }
+        }
+    }
+    vector<int> countMentions(int numberOfUsers, vector<vector<string>>& events) {
+        vector<int> mentionCount(numberOfUsers); //stores mentionCount of all users
+        vector<int> offlineTime(numberOfUsers); //stores when a user was offline
+
+        //1st condition - if both timestamps are equal, first return offline events
+        //2nd condition - if both timestamps are not equal, first return smaller timestamp
+        auto myComparator = [&](vector<string> &c1, vector<string> &c2) {
+            int timeStamp1 = stoi(c1[1]);
+            int timeStamp2 = stoi(c2[1]);
+            if(timeStamp1 == timeStamp2) {
+                char event1 = c1[0][0];
+                char event2 = c2[0][0];
+                return event1 > event2;
+            }
+
+            return timeStamp1 < timeStamp2;
+        };
+
+        sort(begin(events), end(events), myComparator); //sort events on the basis of timestamp
+
+        for(vector<string> &event: events) {
+            if(event[0] == "MESSAGE") {
+                applyMessageEvent(event, mentionCount, offlineTime);
+            }
+            else if(event[0] == "OFFLINE"){
+                int timeStamp = stoi(event[1]);
+                int id = stoi(event[2]);
+                offlineTime[id] = timeStamp;
+            }
+        }
+
+        return mentionCount;
+    }
+};
